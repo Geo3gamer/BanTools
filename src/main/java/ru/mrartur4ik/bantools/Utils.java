@@ -1,16 +1,16 @@
 package ru.mrartur4ik.bantools;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.Period;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class Utils {
 
@@ -34,15 +34,18 @@ public class Utils {
     }
 
     public static long parseTime(String input) throws IllegalArgumentException {
-        PeriodFormatter formatter = new PeriodFormatterBuilder()
-                .appendYears().appendSuffix("Y")
-                .appendDays().appendSuffix("D")
-                .appendHours().appendSuffix("h")
-                .appendMinutes().appendSuffix("m")
-                .appendSeconds().appendSuffix("s")
-                .toFormatter();
+        return Duration.parse(input).toMillis();
+    }
 
-        Period p = formatter.parsePeriod(input);
-        return p.toStandardDuration().getMillis();
+    public static String getDisplayName(UUID uuid) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+        String name = "Console";
+        if(player.getName() != null) {
+            name = player.getName();
+            if(player.isOnline()) {
+                name = ((Player) player).getDisplayName();
+            }
+        }
+        return name;
     }
 }

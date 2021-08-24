@@ -1,6 +1,5 @@
 package ru.mrartur4ik.bantools.commands;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import ru.mrartur4ik.bantools.BanTools;
@@ -19,7 +18,7 @@ public class ReloadBansCommand extends SimpleCommand {
     public boolean exec(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
         plugin.getBansConfig().reloadConfig();
         plugin.getConfig().reloadConfig();
-        sender.sendMessage(Component.text("§eСписок банов перезагружен"));
+        sender.sendMessage("§eСписок банов перезагружен");
         return true;
     }
 }

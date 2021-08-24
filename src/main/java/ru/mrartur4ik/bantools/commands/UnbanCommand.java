@@ -46,7 +46,7 @@ public class UnbanCommand extends SimpleCommand {
                 bansConfig.unban(target.getUniqueId());
                 bansConfig.saveConfig();
 
-                Bukkit.broadcast(plugin.unbanMessage(target.getUniqueId(), ban));
+                Bukkit.broadcastMessage(plugin.unbanMessage(target.getUniqueId(), ban));
             } else {
                 sender.sendMessage(config.getColorizedString("info.player-has-not-banned"));
             }

@@ -15,4 +15,4 @@ info:
   player-has-not-banned: "&cЭтот игрок не имеет бана!"
   player-has-not-played-before: "&cЭтого игрока не было на сервере!"
   incorrect-ip: "&cВведите правильный IP-адрес."
-  incorrect-time: "&cВведите правильное время по формату 1Y1M1D1h1m1s."
+  incorrect-time: "&cВведите правильное время по формату &6P&f1Y1M1D&6T&f1H1M1S."

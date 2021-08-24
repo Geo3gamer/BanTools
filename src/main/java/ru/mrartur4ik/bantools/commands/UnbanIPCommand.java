@@ -41,7 +41,7 @@ public class UnbanIPCommand extends SimpleCommand {
                     bansConfig.unbanIP(ip);
                     bansConfig.saveConfig();
 
-                    Bukkit.broadcast(plugin.unbanMessage(ip, ban));
+                    Bukkit.broadcastMessage(plugin.unbanMessage(ip, ban));
                 } else {
                     sender.sendMessage(config.getColorizedString("info.incorrect-ip"));
                 }

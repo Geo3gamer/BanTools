@@ -5,7 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.jetbrains.annotations.NotNull;
 import ru.mrartur4ik.bantools.BanTools;
 import ru.mrartur4ik.bantools.Utils;
@@ -51,10 +50,10 @@ public class BanIPCommand extends SimpleCommand {
                 if(Pattern.matches("([0-9]{1,3}[.]){3}[0-9]{1,3}", ip)) {
                     bansConfig.banIP(ip.replace('.', '-'), ban);
 
-                    Bukkit.broadcast(plugin.broadcastMessage(ip.replace('.', '-'), ban));
+                    Bukkit.broadcastMessage(plugin.broadcastMessage(ip.replace('.', '-'), ban));
 
                     for(Player p : Utils.getOnlinePlayersByAddress(ip)) {
-                        p.kick(plugin.kickMessage(ban, true), PlayerKickEvent.Cause.BANNED);
+                        p.kickPlayer(plugin.kickMessage(ban, true));
                     }
                 } else {
                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(ip);
@@ -73,7 +72,7 @@ public class BanIPCommand extends SimpleCommand {
                         }
                         bansConfig.banIP(s, ban);
 
-                        Bukkit.broadcast(plugin.broadcastMessage(s, ban));
+                        Bukkit.broadcastMessage(plugin.broadcastMessage(s, ban));
                     }
 
                     if(target.isOnline()) {
@@ -82,10 +81,10 @@ public class BanIPCommand extends SimpleCommand {
                         if(!bansConfig.getIPBans().containsKey(address)){
                             bansConfig.banIP(address, ban);
 
-                            Bukkit.broadcast(plugin.broadcastMessage(address, ban));
+                            Bukkit.broadcastMessage(plugin.broadcastMessage(address, ban));
                         }
 
-                        p.kick(plugin.kickMessage(ban, true), PlayerKickEvent.Cause.BANNED);
+                        p.kickPlayer(plugin.kickMessage(ban, true));
                     }
                 }
                 bansConfig.saveConfig();

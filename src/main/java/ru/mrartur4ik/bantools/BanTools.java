@@ -1,20 +1,15 @@
 package ru.mrartur4ik.bantools;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTimeUtils;
 import ru.mrartur4ik.bantools.commands.*;
 import ru.mrartur4ik.bantools.config.Ban;
 import ru.mrartur4ik.bantools.config.BansConfiguration;
@@ -72,13 +67,11 @@ public class BanTools extends JavaPlugin implements Listener, Runnable {
         return config;
     }
 
-    public TextComponent kickMessage(Ban ban, boolean ipban) {
-        String name = Bukkit.getOfflinePlayer(ban.getFrom()).getName();
-
+    public String kickMessage(Ban ban, boolean ipban) {
         String message = ipban ? config.getColorizedString("kick.ip-kick-message")
                 : config.getColorizedString("kick.kick-message");
 
-        StringBuilder str = new StringBuilder(Objects.requireNonNull(message.replace("%player%", name != null ? name : "Console")));
+        StringBuilder str = new StringBuilder(message.replace("%player%", Utils.getDisplayName(ban.getFrom())));
         if (!ban.getReason().equals("")) {
             str.append("\n");
             str.append(config.getColorizedString("kick.reason").replace("%reason%", ban.getReason()));
@@ -88,26 +81,11 @@ public class BanTools extends JavaPlugin implements Listener, Runnable {
             str.append(config.getColorizedString("kick.expire").replace("%date%", dateFormat.format(new Date(ban.getTime()))));
         }
 
-        return Component.text(str.toString());
+        return str.toString();
     }
 
-    public Component broadcastMessage(UUID uuid, Ban ban) {
-        OfflinePlayer banned = Bukkit.getOfflinePlayer(uuid);
-        String bannedname = banned.getName();
-        if(banned.isOnline()) {
-            bannedname = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) banned).displayName());
-        }
-
-        OfflinePlayer player = Bukkit.getOfflinePlayer(ban.getFrom());
-        String name = "Console";
-        if(player.getName() != null) {
-            name = player.getName();
-            if(player.isOnline()) {
-                name = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) player).displayName());
-            }
-        }
-
-        StringBuilder str = new StringBuilder(config.getColorizedString("broadcast.ban-message").replace("%banned%", Objects.requireNonNull(bannedname)).replace("%player%", name));
+    public String broadcastMessage(UUID uuid, Ban ban) {
+        StringBuilder str = new StringBuilder(config.getColorizedString("broadcast.ban-message").replace("%banned%", Utils.getDisplayName(uuid)).replace("%player%", Utils.getDisplayName(ban.getFrom())));
 
         if (!ban.getReason().equals("")) {
             str.append(config.getColorizedString("broadcast.reason").replace("%reason%", ban.getReason()));
@@ -116,37 +94,24 @@ public class BanTools extends JavaPlugin implements Listener, Runnable {
             str.append(config.getColorizedString("broadcast.expire").replace("%date%", BanTools.getInstance().dateFormat.format(new Date(ban.getTime()))));
         }
 
-        return Component.text(str.toString());
+        return str.toString();
     }
 
-    public Component broadcastMessage(String address, Ban ban) {
+    public String broadcastMessage(String address, Ban ban) {
         String banned;
         List<OfflinePlayer> list = bansConfig.getPlayersByAddress(address);
         if(!list.isEmpty()) {
             StringBuilder bannedpls = new StringBuilder();
             for(int i = 0; i < list.size(); i++) {
                 OfflinePlayer bannedpl = list.get(i);
-                String name = bannedpl.getName();
-                if(bannedpl.isOnline()) {
-                    name = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) bannedpl).displayName());
-                }
-                bannedpls.append(name).append(i < list.size() - 1 ? "": ", ");
+                bannedpls.append(Utils.getDisplayName(bannedpl.getUniqueId())).append(i < list.size() - 1 ? "": ", ");
             }
             banned = bannedpls.toString();
         } else {
             banned = address.replace('-', '.');
         }
 
-        OfflinePlayer player = Bukkit.getOfflinePlayer(ban.getFrom());
-        String name = "Console";
-        if(player.getName() != null) {
-            name = player.getName();
-            if(player.isOnline()) {
-                name = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) player).displayName());
-            }
-        }
-
-        StringBuilder str = new StringBuilder(config.getColorizedString("broadcast.ban-ip-message").replace("%banned%", banned).replace("%player%", name));
+        StringBuilder str = new StringBuilder(config.getColorizedString("broadcast.ban-ip-message").replace("%banned%", banned).replace("%player%", Utils.getDisplayName(ban.getFrom())));
 
         if (!ban.getReason().equals("")) {
             str.append(config.getColorizedString("broadcast.reason").replace("%reason%", ban.getReason()));
@@ -155,56 +120,28 @@ public class BanTools extends JavaPlugin implements Listener, Runnable {
             str.append(config.getColorizedString("broadcast.expire").replace("%date%", BanTools.getInstance().dateFormat.format(new Date(ban.getTime()))));
         }
 
-        return Component.text(str.toString());
+        return str.toString();
     }
 
-    public Component unbanMessage(UUID uuid, Ban ban) {
-        OfflinePlayer unbanned = Bukkit.getOfflinePlayer(uuid);
-        String unbannedname = unbanned.getName();
-        if(unbanned.isOnline()) {
-            unbannedname = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) unbanned).displayName());
-        }
-
-        OfflinePlayer player = Bukkit.getOfflinePlayer(ban.getFrom());
-        String name = "Console";
-        if(player.getName() != null) {
-            name = player.getName();
-            if(player.isOnline()) {
-                name = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) player).displayName());
-            }
-        }
-
-        return Component.text(config.getColorizedString("broadcast.unban-message").replace("%unbanned%", Objects.requireNonNull(unbannedname)).replace("%player%", name));
+    public String unbanMessage(UUID uuid, Ban ban) {
+        return config.getColorizedString("broadcast.unban-message").replace("%unbanned%", Utils.getDisplayName(uuid)).replace("%player%", Utils.getDisplayName(ban.getFrom()));
     }
 
-    public Component unbanMessage(String address, Ban ban) {
+    public String unbanMessage(String address, Ban ban) {
         String banned;
         List<OfflinePlayer> list = bansConfig.getPlayersByAddress(address);
         if(!list.isEmpty()) {
             StringBuilder bannedpls = new StringBuilder();
             for(int i = 0; i < list.size(); i++) {
                 OfflinePlayer bannedpl = list.get(i);
-                String name = bannedpl.getName();
-                if(bannedpl.isOnline()) {
-                    name = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) bannedpl).displayName());
-                }
-                bannedpls.append(name).append(i < list.size() - 1 ? "": ", ");
+                bannedpls.append(Utils.getDisplayName(bannedpl.getUniqueId())).append(i < list.size() - 1 ? "": ", ");
             }
             banned = bannedpls.toString();
         } else {
             banned = address.replace('-', '.');
         }
 
-        OfflinePlayer player = Bukkit.getOfflinePlayer(ban.getFrom());
-        String name = "Console";
-        if(player.getName() != null) {
-            name = player.getName();
-            if(player.isOnline()) {
-                name = LegacyComponentSerializer.legacySection().serializeOrNull(((Player) player).displayName());
-            }
-        }
-
-        return Component.text(config.getColorizedString("broadcast.unban-message").replace("%banned%", banned).replace("%player%", name));
+        return config.getColorizedString("broadcast.unban-message").replace("%banned%", banned).replace("%player%", Utils.getDisplayName(ban.getFrom()));
     }
 
     @EventHandler

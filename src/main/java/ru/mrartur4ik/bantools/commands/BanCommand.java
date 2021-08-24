@@ -5,7 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.jetbrains.annotations.NotNull;
 import ru.mrartur4ik.bantools.BanTools;
 import ru.mrartur4ik.bantools.config.Ban;
@@ -54,10 +53,10 @@ public class BanCommand extends SimpleCommand {
                 bansConfig.ban(target.getUniqueId(), ban);
                 bansConfig.saveConfig();
 
-                Bukkit.broadcast(plugin.broadcastMessage(target.getUniqueId(), ban));
+                Bukkit.broadcastMessage(plugin.broadcastMessage(target.getUniqueId(), ban));
 
                 if(target.isOnline()) {
-                    ((Player) target).kick(plugin.kickMessage(ban, false), PlayerKickEvent.Cause.BANNED);
+                    ((Player) target).kickPlayer(plugin.kickMessage(ban, false));
                 }
             } else {
                 sender.sendMessage(config.getColorizedString("info.player-already-in-ban"));
